@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "materials_project_etl"
+version = "0.0.1"
+authors = ["Arman Hovhannisyan <hovhannisyanarman062@gmail.com>"]
+description = "ETL pipeline for Materials Project API"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+python-dotenv = "^1.0.0"
+pymatgen = "2024.10.3"
+pandas = "^2.2.3"
+numpy = "1.26.4"
+scipy = "^1.7.3"
+pyarrow = "^18.1.0"
+
+# Materials project
+mp_api = "*"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.23.2"
+pytest-dotenv = "^0.5.2"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+pythonpath = [
+    "src",
+    "tests"
+]
