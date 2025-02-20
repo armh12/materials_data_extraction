@@ -12,4 +12,4 @@ class RestClient:
 
     @property
     def mp_rester(self):
-        return MPRester(self.api_key, session=self.session)
+        return MPRester(api_key=self.api_key, )#session=self.session)

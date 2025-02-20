@@ -16,7 +16,7 @@ from emmet.core.absorption import AbsorptionDoc
 from emmet.core.material import MaterialsDoc
 from emmet.core.magnetism import MagnetismDoc
 from emmet.core.bonds import BondingDoc
-from emmet.core.alloys import AlloyPairDoc
+# from emmet.core.alloys import AlloyPairDoc
 from emmet.core.polar import DielectricDoc
 from emmet.core.thermo import ThermoDoc
 
@@ -70,13 +70,13 @@ class DocsAbstractClient(ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
-    def search_materials_alloys(self, materials_ids: List[str] | List[MPID]) -> List[AlloyPairDoc] | List[Dict]:
-        """
-        Query for hypothetical alloys formed between two commensurate crystal structures,
-        following the methodology in https:// doi. org/ 10.48550/ arXiv.2206.10715 .
-        """
-        raise NotImplementedError()
+    # @abstractmethod
+    # def search_materials_alloys(self, materials_ids: List[str] | List[MPID]) -> List[AlloyPairDoc] | List[Dict]:
+    #     """
+    #     Query for hypothetical alloys formed between two commensurate crystal structures,
+    #     following the methodology in https:// doi. org/ 10.48550/ arXiv.2206.10715 .
+    #     """
+    #     raise NotImplementedError()
 
     @abstractmethod
     def search_materials_chemenv(self, materials_ids: List[str] | List[MPID]) -> List[ChemEnvDoc]:
@@ -140,7 +140,7 @@ class DocsClient(DocsAbstractClient):
         super().__init__(rest_client=rest_client)
 
     def get_materials_ids(self, chemsys_formula: str) -> List[MPID]:
-        material_ids = self._client.mp_rester.get_materials_ids(chemsys_formula)
+        material_ids = self._client.mp_rester.get_material_ids(chemsys_formula)
         return material_ids
 
     def search_materials(self, materials_ids: List[str] | List[MPID]) -> List[MaterialsDoc]:
@@ -162,9 +162,9 @@ class DocsClient(DocsAbstractClient):
     def search_materials_for_electronic_structure_dos(self, materials_ids: List[str] | List[MPID]):  # TODO
         pass
 
-    def search_materials_alloys(self, materials_ids: List[str] | List[MPID]) -> List[AlloyPairDoc] | List[Dict]:
-        alloys = self._client.mp_rester.alloy.search(material_ids=materials_ids)
-        return alloys
+    # def search_materials_alloys(self, materials_ids: List[str] | List[MPID]) -> List[AlloyPairDoc] | List[Dict]:
+    #     alloys = self._client.mp_rester.alloy.search(material_ids=materials_ids)
+    #     return alloys
 
     def search_materials_chemenv(self, materials_ids: List[str] | List[MPID]) -> List[ChemEnvDoc]:
         chemenv = self._client.mp_rester.chemenv.search(material_ids=materials_ids)
