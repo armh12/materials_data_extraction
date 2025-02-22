@@ -156,7 +156,7 @@ class DocsClient(DocsAbstractClient):
         return absorption_data
 
     def search_materials_for_bonds(self, materials_ids: List[str] | List[MPID]) -> List[BondingDoc]:
-        bond_data = self._client.mp_rester.bond.search(material_ids=materials_ids)
+        bond_data = self._client.mp_rester.bonds.search(material_ids=materials_ids)
         return bond_data
 
     def search_materials_for_electronic_structure_dos(self, materials_ids: List[str] | List[MPID]):  # TODO
@@ -191,9 +191,10 @@ class DocsClient(DocsAbstractClient):
         return thermo
 
     def search_materials_molecules_properties(self, materials_ids: List[str] | List[MPID]) -> List[MoleculesDoc]:
-        molecules = self._client.mp_rester.molecules.search(material_ids=materials_ids)
-        return molecules
+        # molecules = self._client.mp_rester.molecules.search(material_ids=materials_ids)
+        # return molecules
+        pass
 
     def search_materials_grain_boundaries(self, materials_ids: List[str] | List[MPID]) -> List[GrainBoundaryDoc]:
-        grain_boundaries = self._client.mp_rester.grain.boundaries.search(material_ids=materials_ids)
+        grain_boundaries = self._client.mp_rester.grain_boundaries.search(material_ids=materials_ids)
         return grain_boundaries
