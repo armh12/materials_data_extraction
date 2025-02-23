@@ -1,10 +1,7 @@
 import pytest
-import pandas as pd
 
-from emmet.core.material import MaterialsDoc
 from emmet.core.mpid import MPID
 from pymatgen.core import Composition
-from pyspark import Row
 
 from materials_project_etl.transform.parsers import (
     parse_composition,

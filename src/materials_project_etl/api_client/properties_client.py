@@ -114,7 +114,7 @@ class PropertiesClient(PropertiesAbstractClient):
         super().__init__(rest_client=rest_client)
 
     def get_band_structure(self, material_id: str | MPID) -> BandStructureSymmLine:
-        band_structure = self._client.mp_rester.get_band_structure(material_id)
+        band_structure = self._client.mp_rester.get_bandstructure_by_material_id(material_id)
         return band_structure
 
     def get_entries(self, material_id: str | MPID) -> ComputedStructureEntry | List[ComputedStructureEntry]:
@@ -122,15 +122,15 @@ class PropertiesClient(PropertiesAbstractClient):
         return entries
 
     def get_charge_density(self, material_id: str | MPID) -> Chgcar:
-        charge_density = self._client.mp_rester.get_charge_density(material_id)
+        charge_density = self._client.mp_rester.get_charge_density_from_material_id(material_id)
         return charge_density
 
     def get_phonon_band_structure(self, material_id: str | MPID) -> BandStructureSymmLine:
-        band_structure = self._client.mp_rester.get_phonon_band_structure(material_id)
+        band_structure = self._client.mp_rester.get_phonon_bandstructure_by_material_id(material_id)
         return band_structure
 
     def get_structure(self, material_id: str | MPID, final: bool = True) -> Structure:
-        structure = self._client.mp_rester.get_structure(material_id, final=final)
+        structure = self._client.mp_rester.get_structures(material_id, final=final)
         return structure
 
     def get_wulff_shape(self, material_id: str | MPID) -> WulffShape:

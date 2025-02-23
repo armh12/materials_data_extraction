@@ -1,5 +1,6 @@
 from emmet.core.symmetry import CrystalSystem
 from pymatgen.core import Composition, Structure
+from collections import OrderedDict
 
 
 def parse_composition(composition: Composition) -> dict:
@@ -27,8 +28,42 @@ def parse_crystal_system(crystal_system: dict) -> dict:
 
 
 def parse_structure(structure: Structure) -> dict:
+    def __group_by_label(data):
+        grouped = {}
+        for atom in data:
+            label = atom['label']
+            atom_info = {
+                'abc': atom['abc'],
+                'properties': atom['properties'],
+                'xyz': atom['xyz'],
+            }
+            if label not in grouped:
+                grouped[label] = []
+            grouped[label].append(atom_info)
+        return grouped
+
     structure = structure.as_dict()
     sites = structure.pop("sites")
-    for specie in sites:
-        ...
-    parsed_structure = {}
+    # define elements order in structure
+    species = [site["species"] for site in sites]
+    elements = []
+    for specie in species:
+        element = specie[0]["element"]
+        if element not in elements:
+            elements.append(element)
+    order = {
+        1: "A",
+        2: "B",
+        3: "C",
+    }
+    elements = {element: order[i] for i, element in enumerate(elements, start=1)}
+
+    grouped_sites = __group_by_label(sites)
+    for label, sites in grouped_sites.items():
+        label_order = elements[label]
+        for i, site in enumerate(sites, start=1):
+            label_order_atomic = f'{label_order}_{i}'
+            abc = site["abc"]
+
+            print(label_order_atomic)
+            print(site)
