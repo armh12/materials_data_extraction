@@ -10,7 +10,7 @@ from pymatgen.io.vasp import Chgcar
 
 @pytest.fixture
 def material_id() -> MPID:
-    return MPID("mp-2914")
+    return MPID("mp-2920")  # mp-2914
 
 
 def test_get_band_structure(properties_client, material_id):

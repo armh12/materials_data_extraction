@@ -38,7 +38,7 @@ def test_search_materials_data_in_magnetism_docs(docs_client, material_ids):
     assert all([isinstance(doc, MagnetismDoc) for doc in magnetism])
 
 
-def test_search_materials_data_in_materials_docs(docs_client, material_ids):
+def test_search_materials_doi(docs_client, material_ids):
     doi = docs_client.search_materials_doi(material_ids)
     assert len(doi) == 4
     assert all([isinstance(doc, DOIDoc) for doc in doi])

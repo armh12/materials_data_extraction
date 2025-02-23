@@ -3,20 +3,18 @@ Retrieve document objects for materials properties, which includes overall refer
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict
+from typing import List
 
+from emmet.core.mpid import MPID
 from emmet.core.chemenv import ChemEnvDoc
 from emmet.core.dois import DOIDoc
 from emmet.core.elasticity import ElasticityDoc
 from emmet.core.eos import EOSDoc
 from emmet.core.grain_boundary import GrainBoundaryDoc
-from emmet.core.molecules_jcesr import MoleculesDoc
-from emmet.core.mpid import MPID
 from emmet.core.absorption import AbsorptionDoc
 from emmet.core.material import MaterialsDoc
 from emmet.core.magnetism import MagnetismDoc
 from emmet.core.bonds import BondingDoc
-# from emmet.core.alloys import AlloyPairDoc
 from emmet.core.polar import DielectricDoc
 from emmet.core.thermo import ThermoDoc
 
@@ -70,14 +68,6 @@ class DocsAbstractClient(ABC):
         """
         raise NotImplementedError()
 
-    # @abstractmethod
-    # def search_materials_alloys(self, materials_ids: List[str] | List[MPID]) -> List[AlloyPairDoc] | List[Dict]:
-    #     """
-    #     Query for hypothetical alloys formed between two commensurate crystal structures,
-    #     following the methodology in https:// doi. org/ 10.48550/ arXiv.2206.10715 .
-    #     """
-    #     raise NotImplementedError()
-
     @abstractmethod
     def search_materials_chemenv(self, materials_ids: List[str] | List[MPID]) -> List[ChemEnvDoc]:
         """
@@ -121,13 +111,6 @@ class DocsAbstractClient(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def search_materials_molecules_properties(self, materials_ids: List[str] | List[MPID]) -> List[MoleculesDoc]:
-        """
-        Query molecule docs using a variety of search criteria.
-        """
-        raise NotImplementedError()
-
-    @abstractmethod
     def search_materials_grain_boundaries(self, materials_ids: List[str] | List[MPID]) -> List[GrainBoundaryDoc]:
         """
         Query grain boundary docs using a variety of search criteria.
@@ -162,10 +145,6 @@ class DocsClient(DocsAbstractClient):
     def search_materials_for_electronic_structure_dos(self, materials_ids: List[str] | List[MPID]):  # TODO
         pass
 
-    # def search_materials_alloys(self, materials_ids: List[str] | List[MPID]) -> List[AlloyPairDoc] | List[Dict]:
-    #     alloys = self._client.mp_rester.alloy.search(material_ids=materials_ids)
-    #     return alloys
-
     def search_materials_chemenv(self, materials_ids: List[str] | List[MPID]) -> List[ChemEnvDoc]:
         chemenv = self._client.mp_rester.chemenv.search(material_ids=materials_ids)
         return chemenv
@@ -189,11 +168,6 @@ class DocsClient(DocsAbstractClient):
     def search_materials_thermo_properties(self, materials_ids: List[str] | List[MPID]) -> List[ThermoDoc]:
         thermo = self._client.mp_rester.thermo.search(material_ids=materials_ids)
         return thermo
-
-    def search_materials_molecules_properties(self, materials_ids: List[str] | List[MPID]) -> List[MoleculesDoc]:
-        # molecules = self._client.mp_rester.molecules.search(material_ids=materials_ids)
-        # return molecules
-        pass
 
     def search_materials_grain_boundaries(self, materials_ids: List[str] | List[MPID]) -> List[GrainBoundaryDoc]:
         grain_boundaries = self._client.mp_rester.grain_boundaries.search(material_ids=materials_ids)
