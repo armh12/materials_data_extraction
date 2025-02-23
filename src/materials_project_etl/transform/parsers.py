@@ -1,6 +1,7 @@
 from emmet.core.symmetry import CrystalSystem
 from pymatgen.core import Composition, Structure
 from pymatgen.entries.computed_entries import ComputedStructureEntry
+from pymatgen.electronic_structure.bandstructure import BandStructureSymmLine
 
 
 def parse_composition(composition: Composition) -> dict:
@@ -159,5 +160,19 @@ def parse_general_thermo_info(thermo_info: dict) -> dict:
     }
     return parsed_thermo_info
 
+
 def parse_decomposition_enthalpy_materials(decomposition_enthalpy_materials: dict) -> dict:
     ...
+
+
+def parse_band_structure(band_structure: BandStructureSymmLine) -> dict:
+    parsed_band_structure = {
+        'formula': band_structure.structure.reduced_formula,
+        'num_of_bands': band_structure.nb_bands,
+        'band_gap': band_structure.get_band_gap(),
+        'fermi_level': band_structure.efermi,
+        'spin_polarized': band_structure.is_spin_polarized,
+        'metal': band_structure.is_metal,
+
+    }
+    return parsed_band_structure

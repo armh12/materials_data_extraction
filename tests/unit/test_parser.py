@@ -3,7 +3,7 @@ import pytest
 from emmet.core.mpid import MPID
 from pymatgen.core import Composition
 
-from materials_project_etl.transform.doc_parsers import (
+from materials_project_etl.transform.parsers import (
     parse_composition,
     parse_crystal_system,
     parse_structure,

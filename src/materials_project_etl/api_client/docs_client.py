@@ -27,7 +27,7 @@ class DocsAbstractClient(ABC):
 
 
     @abstractmethod
-    def get_materials_ids(self, chemsys_formula: str) -> List[MPID]:
+    def get_materials_ids(self, chemsys_formula_abstract: str) -> List[MPID]:
         """
         Returns overall material ID-s from materials project
         """
@@ -122,8 +122,8 @@ class DocsClient(DocsAbstractClient):
     def __init__(self, rest_client: RestClient):
         super().__init__(rest_client=rest_client)
 
-    def get_materials_ids(self, chemsys_formula: str) -> List[MPID]:
-        material_ids = self._client.mp_rester.get_material_ids(chemsys_formula)
+    def get_materials_ids(self, chemsys_formula_abstract: str) -> List[MPID]:
+        material_ids = self._client.mp_rester.get_material_ids(chemsys_formula_abstract)
         return material_ids
 
     def search_materials(self, materials_ids: List[str] | List[MPID]) -> List[MaterialsDoc]:
