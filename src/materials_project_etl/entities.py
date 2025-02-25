@@ -4,9 +4,9 @@ from materials_project_etl.api_client.docs_client import DocsClient
 from materials_project_etl.api_client.properties_client import PropertiesClient
 from materials_project_etl.transform.properties_parsers import BandStructureParser
 from materials_project_etl.transform.docs_parser import (
-    MaterialInfoParser,
-    ThermoParser,
-    MagnetismParser,
+    MaterialDataRepository,
+    ThermoDataRepository,
+    MagnetismDataRepository,
 )
 
 
@@ -17,8 +17,8 @@ class Clients:
 
 
 @dataclass
-class Parsers:
-    material_info_parser: MaterialInfoParser
-    thermo_parser: ThermoParser
-    magnetism_parser: MagnetismParser
+class Repositories:
+    material_repo: MaterialDataRepository
+    thermo_repo: ThermoDataRepository
+    magnetism_repo: MagnetismDataRepository
     band_structure_parser: BandStructureParser

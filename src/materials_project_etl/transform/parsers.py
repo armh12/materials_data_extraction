@@ -1,35 +1,41 @@
+from emmet.core.mpid import MPID
 from emmet.core.symmetry import CrystalSystem
 from pymatgen.core import Composition, Structure
 from pymatgen.entries.computed_entries import ComputedStructureEntry
 from pymatgen.electronic_structure.bandstructure import BandStructureSymmLine
+from pyspark import Row
 
 
-def parse_composition(composition: Composition) -> dict:
+def parse_composition(material_doc_as_dict: dict) -> Row:
+    composition: Composition = material_doc_as_dict.pop("composition")
     formula = composition.formula
-    composition = composition.as_dict()
+    composition_dict = composition.as_dict()
     parsed_composition = {}
-    for i, elem_name in enumerate(composition):
+    for i, elem_name in enumerate(composition_dict):
         if i == 0:
             parsed_composition["A"] = elem_name
-            parsed_composition["A_atoms"] = composition[elem_name]
+            parsed_composition["A_atoms"] = composition_dict[elem_name]
         elif i == 1:
             parsed_composition["B"] = elem_name
-            parsed_composition["B_atoms"] = composition[elem_name]
+            parsed_composition["B_atoms"] = composition_dict[elem_name]
         elif i == 2:
             parsed_composition["C"] = elem_name
-            parsed_composition["C_atoms"] = composition[elem_name]
+            parsed_composition["C_atoms"] = composition_dict[elem_name]
     parsed_composition["formula"] = formula
-    return parsed_composition
+    parsed_composition = _update_id(material_doc_as_dict, parsed_composition)
+    return Row(**parsed_composition)
 
 
-def parse_crystal_system(crystal_system: dict) -> dict:
+def parse_crystal_system(material_doc_as_dict: dict) -> Row:
+    crystal_system = material_doc_as_dict.pop("crystal_system")
     _crystal_system: CrystalSystem = crystal_system.pop("crystal_system")
     crystal_system["crystal_system"] = _crystal_system.value
     del crystal_system["version"]
-    return crystal_system
+    crystal_system = _update_id(material_doc_as_dict, crystal_system)
+    return Row(**crystal_system)
 
 
-def parse_structure(structure: Structure) -> dict:
+def parse_structure(material_doc_as_dict: dict) -> Row:
     def __group_by_label(data):
         grouped = {}
         for atom in data:
@@ -65,12 +71,12 @@ def parse_structure(structure: Structure) -> dict:
         for num in xyz:
             xyz_dict[order[xyz.index(num)]] = num
         return xyz_dict
-
+    structure: Structure = material_doc_as_dict.pop("structure")
     formula = structure.formula
     volume = structure.volume
     density = structure.density
-    structure = structure.as_dict()
-    sites = structure.pop("sites")
+    structure_dict = structure.as_dict()
+    sites = structure_dict.pop("sites")
     # define elements order in structure
     species = [site["species"] for site in sites]
     elements = []
@@ -99,10 +105,12 @@ def parse_structure(structure: Structure) -> dict:
     parsed_structures["formula"] = formula
     parsed_structures["volume"] = volume
     parsed_structures["density"] = density
-    return parsed_structures
+    parsed_structures = _update_id(material_doc_as_dict, parsed_structures)
+    return Row(**parsed_structures)
 
 
-def parse_entries(entries: dict) -> dict:
+def parse_entries(material_doc_as_dict: dict) -> Row:
+    entries = material_doc_as_dict.pop("entries")
     entry: ComputedStructureEntry = entries['GGA']
     parsed_entry = {
         "formula": entry.formula,
@@ -116,49 +124,53 @@ def parse_entries(entries: dict) -> dict:
     entry_data = entry.data
     parsed_entry["oxide_type"] = entry_data["oxide_type"]
     parsed_entry["aspherical"] = entry_data["aspherical"]
-    return parsed_entry
+    parsed_entry = _update_id(material_doc_as_dict, parsed_entry)
+    return Row(**parsed_entry)
 
 
-def parse_materials_general_info(material_info: dict) -> dict:
+def parse_materials_general_info(material_doc_as_dict: dict) -> Row:
     general_info = {
-        "formula": material_info["formula_pretty"],
-        "nsites": material_info["nsites"],
-        "nelements": material_info["nelements"],
-        "chemsys": material_info["chemsys"],
-        "volume": material_info["volume"],
-        "density": material_info["density"],
-        "density_atomic": material_info["density_atomic"]
+        "formula": material_doc_as_dict["formula_pretty"],
+        "nsites": material_doc_as_dict["nsites"],
+        "nelements": material_doc_as_dict["nelements"],
+        "chemsys": material_doc_as_dict["chemsys"],
+        "volume": material_doc_as_dict["volume"],
+        "density": material_doc_as_dict["density"],
+        "density_atomic": material_doc_as_dict["density_atomic"]
     }
-    return general_info
+    general_info = _update_id(material_doc_as_dict, general_info)
+    return Row(**general_info)
 
 
-def parse_magnetism_info(magnetism_info: dict) -> dict:
+def parse_magnetism_info(magnetism_data_as_dict: dict) -> Row:
     parsed_magnetism_info = {
-        "formula": magnetism_info["formula_pretty"],
-        "is_magnetic": magnetism_info["is_magnetic"],
-        "exchange_symmetry": magnetism_info["exchange_symmetry"],
-        "num_magnetic_sites": magnetism_info["num_magnetic_sites"],
-        "num_unique_magnetic_sites": magnetism_info["num_unique_magnetic_sites"],
-        "total_magnetization": magnetism_info["total_magnetization"],
-        "total_magnetization_normalized_vol": magnetism_info["total_magnetization_normalized_vol"],
-        "total_magnetization_normalized_formula_units": magnetism_info["total_magnetization_normalized_formula_units"],
+        "formula": magnetism_data_as_dict["formula_pretty"],
+        "is_magnetic": magnetism_data_as_dict["is_magnetic"],
+        "exchange_symmetry": magnetism_data_as_dict["exchange_symmetry"],
+        "num_magnetic_sites": magnetism_data_as_dict["num_magnetic_sites"],
+        "num_unique_magnetic_sites": magnetism_data_as_dict["num_unique_magnetic_sites"],
+        "total_magnetization": magnetism_data_as_dict["total_magnetization"],
+        "total_magnetization_normalized_vol": magnetism_data_as_dict["total_magnetization_normalized_vol"],
+        "total_magnetization_normalized_formula_units": magnetism_data_as_dict["total_magnetization_normalized_formula_units"],
     }
-    return parsed_magnetism_info
+    parsed_magnetism_info = _update_id(magnetism_data_as_dict, parsed_magnetism_info)
+    return Row(**parsed_magnetism_info)
 
 
-def parse_general_thermo_info(thermo_info: dict) -> dict:
+def parse_general_thermo_info(thermo_data_as_dict: dict) -> Row:
     parsed_thermo_info = {
-        'formula': thermo_info["formula_pretty"],
-        'uncorrected_energy_per_atom': thermo_info['uncorrected_energy_per_atom'],
-        'energy_per_atom': thermo_info['energy_per_atom'],
-        'energy_uncertainy_per_atom': thermo_info['energy_uncertainy_per_atom'],
-        'formation_energy_per_atom': thermo_info['formation_energy_per_atom'],
-        'energy_above_hull': thermo_info['energy_above_hull'],
-        'is_stable': thermo_info['is_stable'],
-        'equilibrium_reaction_energy_per_atom': thermo_info['equilibrium_reaction_energy_per_atom'],
-        'decomposition_enthalpy': thermo_info['decomposition_enthalpy'],
+        'formula': thermo_data_as_dict["formula_pretty"],
+        'uncorrected_energy_per_atom': thermo_data_as_dict['uncorrected_energy_per_atom'],
+        'energy_per_atom': thermo_data_as_dict['energy_per_atom'],
+        'energy_uncertainy_per_atom': thermo_data_as_dict['energy_uncertainy_per_atom'],
+        'formation_energy_per_atom': thermo_data_as_dict['formation_energy_per_atom'],
+        'energy_above_hull': thermo_data_as_dict['energy_above_hull'],
+        'is_stable': thermo_data_as_dict['is_stable'],
+        'equilibrium_reaction_energy_per_atom': thermo_data_as_dict['equilibrium_reaction_energy_per_atom'],
+        'decomposition_enthalpy': thermo_data_as_dict['decomposition_enthalpy'],
     }
-    return parsed_thermo_info
+    parsed_thermo_info = _update_id(thermo_data_as_dict, parsed_thermo_info)
+    return Row(**parsed_thermo_info)
 
 
 def parse_decomposition_enthalpy_materials(decomposition_enthalpy_materials: dict) -> dict:
@@ -176,3 +188,10 @@ def parse_band_structure(band_structure: BandStructureSymmLine) -> dict:
 
     }
     return parsed_band_structure
+
+
+def _update_id(material_data: dict, data: dict):
+    material_id: MPID = material_data["material_id"].string
+    id_ = material_id.replace("mp-", "").strip()
+    data["id"] = id_
+    return data
