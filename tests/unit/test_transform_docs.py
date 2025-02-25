@@ -2,7 +2,7 @@ import pytest
 from emmet.core.mpid import MPID
 from pyspark import Row
 
-from materials_project_etl.transform.docs_parser import MaterialInfoParser, MagnetismParser, ThermoParser
+from materials_project_etl.transform.docs_repository import MaterialInfoParser, MagnetismParser, ThermoParser
 
 
 @pytest.fixture

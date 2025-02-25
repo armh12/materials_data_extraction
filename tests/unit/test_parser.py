@@ -1,7 +1,6 @@
 import pytest
 
 from emmet.core.mpid import MPID
-from pymatgen.core import Composition
 
 from materials_project_etl.transform.parsers import (
     parse_composition,
@@ -10,9 +9,9 @@ from materials_project_etl.transform.parsers import (
     parse_entries,
     parse_materials_general_info,
     parse_magnetism_info,
-    parse_general_thermo_info
+    parse_general_thermo_info,
+    parse_band_structure
 )
-from materials_project_etl.transform.properties_parser import parse_band_structure
 
 mpid = MPID("mp-2879")
 
@@ -24,24 +23,21 @@ def material_data_fixture(docs_client) -> dict:
 
 
 def test_parse_composition(material_data):
-    composition: Composition = material_data["composition"]
-    parsed_structure = parse_composition(composition)
+    parsed_structure = parse_composition(material_data)
     assert isinstance(parsed_structure, dict)
     req_fields = {"A", "B", "C", "A_atoms", "B_atoms", "C_atoms", "formula"}
     assert req_fields == set(parsed_structure.keys())
 
 
 def test_parse_crystal_system(material_data):
-    crystal_system = material_data["symmetry"]
-    parsed_crystal_system = parse_crystal_system(crystal_system)
+    parsed_crystal_system = parse_crystal_system(material_data)
     assert isinstance(parsed_crystal_system, dict)
     req_fields = {'symbol', 'number', 'point_group', 'symprec', 'angle_tolerance', 'crystal_system'}
     assert req_fields == set(parsed_crystal_system.keys())
 
 
 def test_parse_structure(material_data):
-    structure = material_data["structure"]
-    parsed_structure = parse_structure(structure)
+    parsed_structure = parse_structure(material_data)
     assert isinstance(parsed_structure, dict)
     req_fields = {'label_A_1', 'a_A_1', 'b_A_1', 'c_A_1', 'x_A_1', 'y_A_1', 'z_A_1', 'label_A_2', 'a_A_2', 'b_A_2',
                   'c_A_2', 'x_A_2', 'y_A_2', 'z_A_2', 'label_A_3', 'a_A_3', 'b_A_3', 'c_A_3', 'x_A_3', 'y_A_3', 'z_A_3',
@@ -61,8 +57,7 @@ def test_parse_structure(material_data):
 
 
 def test_parse_entries(material_data):
-    entries = material_data["entries"]
-    parsed_entries = parse_entries(entries)
+    parsed_entries = parse_entries(material_data)
     assert isinstance(parsed_entries, dict)
     req_fields = {'formula', 'energy', 'energy_correction', 'correction_uncertainty', 'energy_per_atom',
                   'energy_per_atom_correction', 'correction_uncertainty_per_atom', 'oxide_type', 'aspherical'}

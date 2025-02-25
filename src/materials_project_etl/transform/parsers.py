@@ -177,7 +177,7 @@ def parse_decomposition_enthalpy_materials(decomposition_enthalpy_materials: dic
     ...
 
 
-def parse_band_structure(band_structure: BandStructureSymmLine) -> dict:
+def parse_band_structure(band_structure: BandStructureSymmLine) -> Row:
     parsed_band_structure = {
         'formula': band_structure.structure.reduced_formula,
         'num_of_bands': band_structure.nb_bands,
@@ -185,9 +185,8 @@ def parse_band_structure(band_structure: BandStructureSymmLine) -> dict:
         'fermi_level': band_structure.efermi,
         'spin_polarized': band_structure.is_spin_polarized,
         'metal': band_structure.is_metal,
-
     }
-    return parsed_band_structure
+    return Row(**parsed_band_structure)
 
 
 def _update_id(material_data: dict, data: dict):

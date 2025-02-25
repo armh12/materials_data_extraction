@@ -2,8 +2,8 @@ from dataclasses import dataclass
 
 from materials_project_etl.api_client.docs_client import DocsClient
 from materials_project_etl.api_client.properties_client import PropertiesClient
-from materials_project_etl.transform.properties_parsers import BandStructureParser
-from materials_project_etl.transform.docs_parser import (
+from materials_project_etl.transform.properties_repository import PropertiesRepository
+from materials_project_etl.transform.docs_repository import (
     MaterialDataRepository,
     ThermoDataRepository,
     MagnetismDataRepository,
@@ -21,4 +21,4 @@ class Repositories:
     material_repo: MaterialDataRepository
     thermo_repo: ThermoDataRepository
     magnetism_repo: MagnetismDataRepository
-    band_structure_parser: BandStructureParser
+    properties_repo: PropertiesRepository
