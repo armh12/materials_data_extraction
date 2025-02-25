@@ -10,7 +10,6 @@ from emmet.core.magnetism import MagnetismDoc
 from emmet.core.material import MaterialsDoc
 from emmet.core.mpid import MPID
 from emmet.core.polar import DielectricDoc
-from emmet.core.qchem.molecule import MoleculeDoc
 from emmet.core.thermo import ThermoDoc
 
 
@@ -82,13 +81,6 @@ def test_search_materials_for_bonds(docs_client, material_ids):
     bonds = docs_client.search_materials_for_bonds(material_ids)
     assert len(bonds) == 4
     assert all([isinstance(doc, BondingDoc) for doc in bonds])
-
-
-@pytest.mark.skip(reason="Not valid implementation provided")
-def test_search_materials_molecules_properties(docs_client, material_ids):
-    molecules = docs_client.search_materials_molecules_properties(material_ids)
-    assert len(molecules) == 4
-    assert all([isinstance(doc, MoleculeDoc) for doc in molecules])
 
 
 def test_search_materials_thermo_properties(docs_client, material_ids):

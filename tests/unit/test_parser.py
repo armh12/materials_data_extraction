@@ -1,6 +1,7 @@
 import pytest
 
 from emmet.core.mpid import MPID
+from pyspark import Row
 
 from materials_project_etl.transform.parsers import (
     parse_composition,
@@ -24,21 +25,21 @@ def material_data_fixture(docs_client) -> dict:
 
 def test_parse_composition(material_data):
     parsed_structure = parse_composition(material_data)
-    assert isinstance(parsed_structure, dict)
-    req_fields = {"A", "B", "C", "A_atoms", "B_atoms", "C_atoms", "formula"}
-    assert req_fields == set(parsed_structure.keys())
+    assert isinstance(parsed_structure, Row)
+    req_fields = {"A", "B", "C", "A_atoms", "B_atoms", "C_atoms", "formula", "id"}
+    assert req_fields == set(parsed_structure.asDict().keys())
 
 
 def test_parse_crystal_system(material_data):
     parsed_crystal_system = parse_crystal_system(material_data)
-    assert isinstance(parsed_crystal_system, dict)
-    req_fields = {'symbol', 'number', 'point_group', 'symprec', 'angle_tolerance', 'crystal_system'}
-    assert req_fields == set(parsed_crystal_system.keys())
+    assert isinstance(parsed_crystal_system, Row)
+    req_fields = {'symbol', 'number', 'point_group', 'symprec', 'angle_tolerance', 'crystal_system', 'id'}
+    assert req_fields == set(parsed_crystal_system.asDict().keys())
 
 
 def test_parse_structure(material_data):
     parsed_structure = parse_structure(material_data)
-    assert isinstance(parsed_structure, dict)
+    assert isinstance(parsed_structure, Row)
     req_fields = {'label_A_1', 'a_A_1', 'b_A_1', 'c_A_1', 'x_A_1', 'y_A_1', 'z_A_1', 'label_A_2', 'a_A_2', 'b_A_2',
                   'c_A_2', 'x_A_2', 'y_A_2', 'z_A_2', 'label_A_3', 'a_A_3', 'b_A_3', 'c_A_3', 'x_A_3', 'y_A_3', 'z_A_3',
                   'label_A_4', 'a_A_4', 'b_A_4', 'c_A_4', 'x_A_4', 'y_A_4', 'z_A_4', 'label_B_1', 'a_B_1', 'b_B_1',
@@ -52,45 +53,48 @@ def test_parse_structure(material_data):
                   'b_C_8', 'c_C_8', 'x_C_8', 'y_C_8', 'z_C_8', 'label_C_9', 'a_C_9', 'b_C_9', 'c_C_9', 'x_C_9', 'y_C_9',
                   'z_C_9', 'label_C_10', 'a_C_10', 'b_C_10', 'c_C_10', 'x_C_10', 'y_C_10', 'z_C_10', 'label_C_11',
                   'a_C_11', 'b_C_11', 'c_C_11', 'x_C_11', 'y_C_11', 'z_C_11', 'label_C_12', 'a_C_12', 'b_C_12',
-                  'c_C_12', 'x_C_12', 'y_C_12', 'z_C_12', 'formula', 'density', 'volume'}
-    assert req_fields == set(parsed_structure.keys())
+                  'c_C_12', 'x_C_12', 'y_C_12', 'z_C_12', 'formula', 'density', 'volume', 'id'}
+    assert req_fields == set(parsed_structure.asDict().keys())
 
 
 def test_parse_entries(material_data):
     parsed_entries = parse_entries(material_data)
-    assert isinstance(parsed_entries, dict)
+    assert isinstance(parsed_entries, Row)
     req_fields = {'formula', 'energy', 'energy_correction', 'correction_uncertainty', 'energy_per_atom',
-                  'energy_per_atom_correction', 'correction_uncertainty_per_atom', 'oxide_type', 'aspherical'}
-    assert req_fields == set(parsed_entries.keys())
+                  'energy_per_atom_correction', 'correction_uncertainty_per_atom', 'oxide_type', 'aspherical', 'id'}
+    assert req_fields == set(parsed_entries.asDict().keys())
 
 
 def test_parse_general_info(material_data):
-    general_info = parse_materials_general_info(material_data)
-    assert isinstance(general_info, dict)
-    req_cols = {'formula', 'nsites', 'nelements', 'chemsys', 'volume', 'density', 'density_atomic'}
-    assert req_cols == set(general_info.keys())
+    general_data = parse_materials_general_info(material_data)
+    assert isinstance(general_data, Row)
+    req_cols = {'formula', 'nsites', 'nelements', 'chemsys', 'volume', 'density', 'density_atomic', 'id'}
+    assert req_cols == set(general_data.asDict().keys())
 
 
 def test_parse_magnetism_info(docs_client):
     magnetism_data = docs_client.search_materials_data_in_magnetism_docs([mpid])[0].model_dump()
-    magnetism_info = parse_magnetism_info(magnetism_data)
-    assert isinstance(magnetism_info, dict)
+    magnetism_data_parsed = parse_magnetism_info(magnetism_data)
+    assert isinstance(magnetism_data_parsed, Row)
     req_cols = {'formula', 'is_magnetic', 'exchange_symmetry', 'num_magnetic_sites', 'num_unique_magnetic_sites',
                 'total_magnetization', 'total_magnetization_normalized_vol',
-                'total_magnetization_normalized_formula_units'}
-    assert req_cols == set(magnetism_info.keys())
+                'total_magnetization_normalized_formula_units', 'id'}
+    assert req_cols == set(magnetism_data_parsed.asDict().keys())
 
 
 def test_parse_general_thermo_info(docs_client):
     thermo_data = docs_client.search_materials_thermo_properties([mpid])[0].model_dump()
-    thermo_info = parse_general_thermo_info(thermo_data)
-    assert isinstance(thermo_info, dict)
+    thermo_data_parsed = parse_general_thermo_info(thermo_data)
+    assert isinstance(thermo_data_parsed, Row)
     req_cols = {'formula', 'uncorrected_energy_per_atom', 'energy_per_atom', 'energy_uncertainy_per_atom',
                 'formation_energy_per_atom', 'energy_above_hull', 'is_stable', 'equilibrium_reaction_energy_per_atom',
-                'decomposition_enthalpy'}
-    assert req_cols == set(thermo_info.keys())
+                'decomposition_enthalpy', 'id'}
+    assert req_cols == set(thermo_data_parsed.asDict().keys())
 
 
 def test_parse_band_structure(properties_client):
     band_struct = properties_client.get_band_structure(mpid)
     band_struct_parsed = parse_band_structure(band_struct)
+    assert isinstance(band_struct_parsed, Row)
+    req_cols = {'formula', 'num_of_bands', 'band_gap', 'transition', 'fermi_level', 'spin_polarized', 'metal'}
+    assert req_cols == set(band_struct_parsed.asDict().keys())

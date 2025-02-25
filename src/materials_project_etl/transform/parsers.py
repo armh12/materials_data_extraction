@@ -27,7 +27,7 @@ def parse_composition(material_doc_as_dict: dict) -> Row:
 
 
 def parse_crystal_system(material_doc_as_dict: dict) -> Row:
-    crystal_system = material_doc_as_dict.pop("crystal_system")
+    crystal_system = material_doc_as_dict.pop("symmetry")
     _crystal_system: CrystalSystem = crystal_system.pop("crystal_system")
     crystal_system["crystal_system"] = _crystal_system.value
     del crystal_system["version"]
@@ -162,7 +162,6 @@ def parse_general_thermo_info(thermo_data_as_dict: dict) -> Row:
         'formula': thermo_data_as_dict["formula_pretty"],
         'uncorrected_energy_per_atom': thermo_data_as_dict['uncorrected_energy_per_atom'],
         'energy_per_atom': thermo_data_as_dict['energy_per_atom'],
-        'energy_uncertainy_per_atom': thermo_data_as_dict['energy_uncertainy_per_atom'],
         'formation_energy_per_atom': thermo_data_as_dict['formation_energy_per_atom'],
         'energy_above_hull': thermo_data_as_dict['energy_above_hull'],
         'is_stable': thermo_data_as_dict['is_stable'],
@@ -178,13 +177,15 @@ def parse_decomposition_enthalpy_materials(decomposition_enthalpy_materials: dic
 
 
 def parse_band_structure(band_structure: BandStructureSymmLine) -> Row:
+    band_gap_obj = band_structure.get_band_gap()
     parsed_band_structure = {
         'formula': band_structure.structure.reduced_formula,
         'num_of_bands': band_structure.nb_bands,
-        'band_gap': band_structure.get_band_gap(),
+        'band_gap': band_gap_obj["energy"],
+        'transition': band_gap_obj["transition"],
         'fermi_level': band_structure.efermi,
         'spin_polarized': band_structure.is_spin_polarized,
-        'metal': band_structure.is_metal,
+        'metal': band_structure.is_metal(),
     }
     return Row(**parsed_band_structure)
 
@@ -192,5 +193,5 @@ def parse_band_structure(band_structure: BandStructureSymmLine) -> Row:
 def _update_id(material_data: dict, data: dict):
     material_id: MPID = material_data["material_id"].string
     id_ = material_id.replace("mp-", "").strip()
-    data["id"] = id_
+    data["id"] = int(id_)
     return data

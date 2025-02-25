@@ -1,4 +1,5 @@
 import os
+import multiprocessing
 from dotenv import load_dotenv
 from pyspark.sql import SparkSession
 
@@ -14,6 +15,7 @@ from materials_project_etl.transform.properties_repository import PropertiesRepo
 
 DEVELOPMENT_MODE = os.environ.get("DEVELOPMENT_MODE") == "true"
 spark_logging_level = "WARN" if DEVELOPMENT_MODE else "INFO"
+multiprocessing.set_start_method('spawn', force=True)
 
 
 def get_local_spark_session(num_of_cores: int = 4) -> SparkSession:

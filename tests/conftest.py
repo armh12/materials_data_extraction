@@ -3,8 +3,7 @@ from emmet.core.mpid import MPID
 
 from materials_project_etl.api_client.docs_client import DocsClient
 from materials_project_etl.api_client.properties_client import PropertiesClient
-from materials_project_etl.configuration import build_client_configuration
-from materials_project_etl.spark_config import get_local_spark_session
+from materials_project_etl.configuration import build_client_configuration, get_local_spark_session
 
 PEROVSKITE_FORMULA_CLASSIC = "ABC3"
 

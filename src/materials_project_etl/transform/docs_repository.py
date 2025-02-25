@@ -56,12 +56,12 @@ class AbstractMaterialRepository(ABC):
         return self._material_docs
 
     def _update_material_docs(self, material_ids: List[MPID]) -> None:
-        material_docs = self.__request_for_updates(material_ids)
+        material_docs = self._request_for_updates(material_ids)
         material_docs_as_dict = [self._prepare_doc(doc) for doc in material_docs]
         self._material_docs = material_docs_as_dict
 
     @abstractmethod
-    def __request_for_updates(self, material_ids: List[MPID]) -> List[StructureMetadata]:
+    def _request_for_updates(self, material_ids: List[MPID]) -> List[StructureMetadata]:
         raise NotImplementedError()
 
 
@@ -78,7 +78,7 @@ class MaterialDataRepository(AbstractMaterialRepository):
             client=client,
             spark=spark
         )
-    def __request_for_updates(self, material_ids: List[MPID]) -> List[MaterialsDoc]:
+    def _request_for_updates(self, material_ids: List[MPID]) -> List[MaterialsDoc]:
         material_docs = self._client.search_materials(material_ids)
         return material_docs
 
@@ -99,7 +99,7 @@ class MaterialDataRepository(AbstractMaterialRepository):
     def get_structure(self, material_ids: List[MPID]) -> DataFrame:
         material_docs_as_dict = self._request_material_docs(material_ids)
         rdd = self._spark.sparkContext.parallelize(material_docs_as_dict)
-        parsed_rows = rdd.map(parse_structure)
+        parsed_rows = rdd.map(parse_structure).collect() # TODO fix, not heterogeneous data
         structure_df = self._spark.createDataFrame(parsed_rows)
         return structure_df
 
@@ -135,7 +135,7 @@ class MagnetismDataRepository(AbstractMaterialRepository):
             spark=spark
         )
 
-    def __request_for_updates(self, material_ids: List[MPID]) -> List[MagnetismDoc]:
+    def _request_for_updates(self, material_ids: List[MPID]) -> List[MagnetismDoc]:
         magnetism_docs = self._client.search_materials_data_in_magnetism_docs(material_ids)
         return magnetism_docs
 
@@ -153,7 +153,7 @@ class ThermoDataRepository(AbstractMaterialRepository):
         'nsites', 'elements', 'nelements', 'composition', 'formula_anonymous', 'chemsys',
         'volume', 'density', 'density_atomic', 'symmetry', 'entries'
     }
-    def __request_for_updates(self, material_ids: List[MPID]) -> List[ThermoDoc]:
+    def _request_for_updates(self, material_ids: List[MPID]) -> List[ThermoDoc]:
         thermo_docs = self._client.search_materials_thermo_properties(material_ids)
         return thermo_docs
 
